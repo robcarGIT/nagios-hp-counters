@@ -83,14 +83,14 @@ function checkErrors {
              fi
              # Check if critical threshold has been reached.
              if [ $result -ge $maxErrorsCritical ]; then
-                echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "CRITICAL">>$tmpResult
+                echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
-                echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "WARNING">>$tmpResult
+                echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
