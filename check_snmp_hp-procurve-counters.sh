@@ -78,6 +78,9 @@ function checkErrors {
              # So we multiply the errors by N and if result is >= $maxErrors there is a potential problem.
              result=$(($check*$errorsMultiplier/$portPkts))
              percentErrors=$(($result/($errorsMultiplier/100)))
+             if [ $percentErrors -eq 0 ]; then
+                percentErrors="less than 1"
+             fi
              # Check if critical threshold has been reached.
              if [ $result -ge $maxErrorsCritical ]; then
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "CRITICAL">>$tmpResult
