@@ -11,6 +11,9 @@
 # Exit codes in pipeline are the exit codes of the last program to return a non-zero exit code. 
 set -o pipefail
 
+# Tmp dir
+TMPDIR=/tmp
+
 # Function that prints plugin usage.
 print_usage() {
         echo ""
@@ -49,16 +52,16 @@ warningFlag=0
 criticalFlag=0
 
 # Temp files
-tmpFile="/tmp/check_snmp_hp-procurve-counters.tmp"
+tmpFile="$TMPDIR/check_snmp_hp-procurve-counters.tmp"
 # Delete them if they exist
 if [ -f $tmpFile ]; then
    rm $tmpFile
 fi
-tmpTable="/tmp/check_snmp_hp-procurve-counters-table.tmp"
+tmpTable="$TMPDIR/check_snmp_hp-procurve-counters-table.tmp"
 if [ -f $tmpTable ]; then
    rm $tmpTable
 fi
-tmpResult="/tmp/tmpResult.tmp"
+tmpResult="$TMPDIR/tmpResult.tmp"
 if [ -f $tmpResult ]; then
    rm $tmpResult
 fi
