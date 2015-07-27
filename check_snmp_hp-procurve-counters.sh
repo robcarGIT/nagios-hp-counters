@@ -189,17 +189,17 @@ while read p; do
          # Call function checkErrors
          checkErrors
 
-#         # Check broadcasts (Rx+Tx)
-#         check=$portBroadcasts
-#         description="BROADCASTS"
-#         # Call function checkErrors
-#        checkErrors
+         # Check broadcasts (Rx+Tx)
+         check=$portBroadcasts
+         description="BROADCASTS"
+         # Call function checkErrors
+         checkErrors
 
-#        # Check multicasts (Rx+Tx)
-#         check=$portMulticasts
-#         description="MULTICASTS"
-#         # Call function checkErrors
-#        checkErrors
+         # Check multicasts (Rx+Tx)
+         check=$portMulticasts
+         description="MULTICASTS"
+         # Call function checkErrors
+         checkErrors
 
          # Check CRC Align errors
          check=$portCrcAligns
