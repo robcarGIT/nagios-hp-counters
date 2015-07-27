@@ -52,16 +52,16 @@ warningFlag=0
 criticalFlag=0
 
 # Temp files
-tmpFile="$TMPDIR/check_snmp_hp-procurve-counters.tmp"
+tmpFile="$TMPDIR/check_snmp_hp-procurve-counters-"$switchIpAddr".tmp"
 # Delete them if they exist
 if [ -f $tmpFile ]; then
    rm $tmpFile
 fi
-tmpTable="$TMPDIR/check_snmp_hp-procurve-counters-table.tmp"
+tmpTable="$TMPDIR/check_snmp_hp-procurve-counters-table-"$switchIpAddr".tmp"
 if [ -f $tmpTable ]; then
    rm $tmpTable
 fi
-tmpResult="$TMPDIR/tmpResult.tmp"
+tmpResult="$TMPDIR/check-snmp_hp-procurve-counters-tmpResult-"$switchIpAddr".tmp"
 if [ -f $tmpResult ]; then
    rm $tmpResult
 fi
