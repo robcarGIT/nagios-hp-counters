@@ -51,6 +51,10 @@ readonly EXIT_UNKNOWN=3
 warningFlag=0
 criticalFlag=0
 
+# Save plugin parameters
+switchIpAddr=$1
+community=$2
+
 # Temp files
 tmpFile="$TMPDIR/check_snmp_hp-procurve-counters-"$switchIpAddr".tmp"
 # Delete them if they exist
@@ -65,10 +69,6 @@ tmpResult="$TMPDIR/check-snmp_hp-procurve-counters-tmpResult-"$switchIpAddr".tmp
 if [ -f $tmpResult ]; then
    rm $tmpResult
 fi
-
-# Save plugin parameters
-switchIpAddr=$1
-community=$2
 
 # Function that checks errors on ports
 function checkErrors {
