@@ -92,7 +92,7 @@ function checkErrors {
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
-                echo "MAC Address connected to the port: "$MACaddress>>$tmpResult
+                echo "MAC Addresses connected to the port: "$MACaddress>>$tmpResult
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
@@ -103,7 +103,7 @@ function checkErrors {
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
-                echo "MAC Address connected to the port: "$MACaddress>>$tmpResult
+                echo "MAC Addresses connected to the port: "$MACaddress>>$tmpResult
                 # Set warning flag
                 warningFlag=1
              fi
