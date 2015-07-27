@@ -31,6 +31,8 @@ fi
 
 # Set OID tree base
 etherStatsEntry=".1.3.6.1.2.1.16.1.1.1"
+snmpMACPortIndexes=".1.3.6.1.2.1.17.4.3.1.1"
+snmpMACPortAddress=".1.3.6.1.2.1.17.4.3.1.2"
 
 # Set maximum number of errors
 # Examples: 
@@ -83,17 +85,25 @@ function checkErrors {
              fi
              # Check if critical threshold has been reached.
              if [ $result -ge $maxErrorsCritical ]; then
+                # Get MAC address connected to the port
+                MACport=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.2 | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
+                MACaddress=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.1 | grep "\.$MACport = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
+                echo "MAC Address connected to the port: "$MACaddress
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
+                # Get MAC address connected to the port
+                MACport=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.2 | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
+                MACaddress=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.1 | grep "\.$MACport = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
+                echo "MAC Address connected to the port: "$MACaddress
                 # Set warning flag
                 warningFlag=1
              fi
