@@ -5,14 +5,16 @@
 # drops, CRC aligns errors, runts, giants, fragments, jabbers and collisions.
 # If the value obtained is bigger than the 2 thresholds maxErrorsWarning and maxErrorsCritical the correspondent Nagios exit code is announced.
 ##
-# Ver. 0.2a
-# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150707
+# Ver. 0.2b
+# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150727
 
 # Exit codes in pipeline are the exit codes of the last program to return a non-zero exit code. 
 set -o pipefail
 
 # Tmp dir
 TMPDIR=/tmp
+# File with all hardware vendors' MAC addresses
+VENDORSFILE="./oui.txt"
 
 # Function that prints plugin usage.
 print_usage() {
@@ -88,22 +90,26 @@ function checkErrors {
                 # Get MAC address connected to the port
                 MACport=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.2 | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
                 MACaddress=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.1 | grep "\.$MACport = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
+                MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
+		MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
+                echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
-                echo "MAC Addresses connected to the port: "$MACaddress>>$tmpResult
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
                 # Get MAC address connected to the port
                 MACport=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.2 | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
                 MACaddress=`snmpwalk -v 2c -c public 10.13.10.248 1.3.6.1.2.1.17.4.3.1.1 | grep "\.$MACport = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
+                MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
+		MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
+                echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
-                echo "MAC Addresses connected to the port: "$MACaddress>>$tmpResult
                 # Set warning flag
                 warningFlag=1
              fi
