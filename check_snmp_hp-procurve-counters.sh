@@ -74,6 +74,16 @@ if [ -f $tmpResult ]; then
    rm $tmpResult
 fi
 
+
+# Function that extracts MAC addresses and MAC vendors
+function getMAC {
+   # Get MAC address connected to the port
+   MACport=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortAddress | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
+   MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "."$MACport" = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
+   MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
+   MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
+}
+
 # Function that checks errors on ports
 function checkErrors {
          # If there are no errors don't consider this element and skip to the next one.
@@ -88,10 +98,7 @@ function checkErrors {
              # Check if critical threshold has been reached.
              if [ $result -ge $maxErrorsCritical ]; then
                 # Get MAC address connected to the port
-                MACport=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortAddress | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
-                MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "\."$MACport" = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
-                MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
-		MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
+		getMAC
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
                 echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
@@ -101,10 +108,7 @@ function checkErrors {
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
                 # Get MAC address connected to the port
-                MACport=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortAddress | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
-                MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "\."$MACport" = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
-                MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
-		MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
+		getMAC
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
                 echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
@@ -205,17 +209,17 @@ while read p; do
          # Call function checkErrors
          checkErrors
 
-#         # Check broadcasts (Rx+Tx)
-#         check=$portBroadcasts
-#         description="BROADCASTS"
-#         # Call function checkErrors
-#         checkErrors
+         # Check broadcasts (Rx+Tx)
+         check=$portBroadcasts
+         description="BROADCASTS"
+         # Call function checkErrors
+         checkErrors
 
-#         # Check multicasts (Rx+Tx)
-#         check=$portMulticasts
-#         description="MULTICASTS"
-#         # Call function checkErrors
-#         checkErrors
+         # Check multicasts (Rx+Tx)
+         check=$portMulticasts
+         description="MULTICASTS"
+         # Call function checkErrors
+         checkErrors
 
          # Check CRC Align errors
          check=$portCrcAligns
