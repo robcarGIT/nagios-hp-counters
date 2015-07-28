@@ -33,8 +33,7 @@ fi
 
 # Set OID tree base
 etherStatsEntry=".1.3.6.1.2.1.16.1.1.1"
-snmpMACPortIndexes=".1.3.6.1.2.1.17.4.3.1.1"
-snmpMACPortAddress=".1.3.6.1.2.1.17.4.3.1.2"
+snmpMACPortIndexes=".1.3.6.1.2.1.17.4.3.1.2"
 
 # Set maximum number of errors
 # Examples: 
@@ -77,11 +76,8 @@ fi
 
 # Function that extracts MAC addresses and MAC vendors
 function getMAC {
-   # Get MAC address connected to the port
-   MACport=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortAddress | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
-   MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "."$MACport" = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
-   MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
-   MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
+   # Get MAC addresses/vendors connected to the port
+   snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep -w " "$portIndex | cut -d ' ' -f1 | cut -d '.' -f7-12 | tr "." " " | while read line ; do printf "%02x-" $line; grep -i `printf "%02x-" $line | cut -d '-' -f 1-3` oui.txt | cut -f3; done>>$tmpResult
 }
 
 # Function that checks errors on ports
@@ -97,20 +93,20 @@ function checkErrors {
              fi
              # Check if critical threshold has been reached.
              if [ $result -ge $maxErrorsCritical ]; then
-                # Get MAC address connected to the port
-		getMAC
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
-                echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
+                echo "MAC Addresses connected to the port:">>$tmpResult
+		# Call getMAC function
+		getMAC
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
-                # Get MAC address connected to the port
-		getMAC
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
-                echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
+                echo "MAC Addresses connected to the port:">>$tmpResult
+		# Call getMAC function
+		getMAC
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
                 echo "">>$tmpResult
@@ -209,17 +205,17 @@ while read p; do
          # Call function checkErrors
          checkErrors
 
-         # Check broadcasts (Rx+Tx)
-         check=$portBroadcasts
-         description="BROADCASTS"
-         # Call function checkErrors
-         checkErrors
+#         # Check broadcasts (Rx+Tx)
+#         check=$portBroadcasts
+#         description="BROADCASTS"
+#         # Call function checkErrors
+#         checkErrors
 
-         # Check multicasts (Rx+Tx)
-         check=$portMulticasts
-         description="MULTICASTS"
-         # Call function checkErrors
-         checkErrors
+#         # Check multicasts (Rx+Tx)
+#         check=$portMulticasts
+#         description="MULTICASTS"
+#         # Call function checkErrors
+#         checkErrors
 
          # Check CRC Align errors
          check=$portCrcAligns
