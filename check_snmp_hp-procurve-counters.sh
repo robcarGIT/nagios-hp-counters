@@ -79,7 +79,7 @@ fi
 # Function that extracts MAC addresses and MAC vendors
 function getMAC {
    # Get MAC addresses/vendors connected to the port
-   snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep -w " "$portIndex | cut -d ' ' -f1 | cut -d '.' -f7-12 | tr "." " " | while read line ; do printf "%02x-" $line; grep -i `printf "%02x-" $line | cut -d '-' -f 1-3` oui.txt | cut -f3; done>>$tmpResult
+   snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep -w " "$portIndex | cut -d ' ' -f1 | cut -d '.' -f7-12 | tr "." " " | while read line ; do printf "%02x-" $line; grep -i `printf "%02x-" $line | cut -d '-' -f 1-3` $VENDORSFILE | cut -f3; done>>$tmpResult
 }
 
 # Function that checks errors on ports
