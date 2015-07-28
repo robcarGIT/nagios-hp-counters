@@ -6,7 +6,7 @@
 # If the value obtained is bigger than the 2 thresholds maxErrorsWarning and maxErrorsCritical the correspondent Nagios exit code is announced.
 ##
 # Ver. 0.2b
-# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150727
+# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150728
 
 # Exit codes in pipeline are the exit codes of the last program to return a non-zero exit code. 
 set -o pipefail
@@ -35,7 +35,7 @@ fi
 etherStatsEntry=".1.3.6.1.2.1.16.1.1.1"
 snmpMACPortIndexes=".1.3.6.1.2.1.17.4.3.1.2"
 
-# Set maximum number of errors
+# Set maximum number of errors referred to TX+RX packets
 # Examples: 
 # - to get 1% threshold, set errorsMultiplier to 1000 and maxErrorsWarning or maxErrorsCritical to 10
 # - to get 5% threshold, set errorsMultiplier to 1000 and maxErrorsWarning or maxErrorsCritical to 50
@@ -43,6 +43,8 @@ snmpMACPortIndexes=".1.3.6.1.2.1.17.4.3.1.2"
 errorsMultiplier=1000
 maxErrorsWarning=5
 maxErrorsCritical=50
+# Set a maximum number of errors in general, not referred to TX+RX packets
+maxErrorsGeneral=2000
 
 # The following ones will be used as exit codes by Nagios
 readonly EXIT_OK=0
@@ -91,8 +93,8 @@ function checkErrors {
              if [ $percentErrors -eq 0 ]; then
                 percentErrors="less than 1"
              fi
-             # Check if critical threshold has been reached.
-             if [ $result -ge $maxErrorsCritical ]; then
+             # Check if critical threshold has been reached, either as a percentage or as a general maximum.
+             if [ $result -ge $maxErrorsCritical ] || [ $check -ge $maxErrorsGeneral ]; then
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
                 echo "MAC Addresses connected to the port:">>$tmpResult
 		# Call getMAC function
@@ -219,7 +221,7 @@ while read p; do
 
          # Check CRC Align errors
          check=$portCrcAligns
-         description="CRC ALIGN ERRORS"
+         description="CRC ALIGN ERRORS/FCS"
          longDescription="Wrong checksum or frames received that don't end with an even number of octets."
          rootCause="Half/full duplex mismatch or faulty driver, NIC or faulty cable."
          # Call function checkErrors
