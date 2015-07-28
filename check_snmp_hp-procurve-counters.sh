@@ -89,28 +89,26 @@ function checkErrors {
              if [ $result -ge $maxErrorsCritical ]; then
                 # Get MAC address connected to the port
                 MACport=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortAddress | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
-                MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "\.$MACport = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
+                MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "\."$MACport" = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
                 MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
 		MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
                 echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
-		echo "Test: "$MACport $MACvendorHEX
                 echo "">>$tmpResult
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
                 # Get MAC address connected to the port
                 MACport=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortAddress | grep -w " "$portIndex | awk '{ print $1; }' | cut -d '.' -f12`
-                MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "\.$MACport = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
+                MACaddress=`snmpwalk -v 2c -c $community $switchIpAddr $snmpMACPortIndexes | grep "\."$MACport" = " | cut -d ' ' -f 4-9 | sed 's/ /-/g'`
                 MACvendorHEX=`echo $MACaddress | cut -d '-' -f 1-3`
 		MACvendor=`grep $MACvendorHEX $VENDORSFILE | cut -f3`
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
                 echo "MAC Addresses connected to the port: "$MACaddress" (vendor" $MACvendor")">>$tmpResult
                 echo "Description : "$longDescription>>$tmpResult
                 echo "Common cause: "$rootCause>>$tmpResult
-		echo "Test: "$MACport $MACvendorHEX
                 echo "">>$tmpResult
                 # Set warning flag
                 warningFlag=1
