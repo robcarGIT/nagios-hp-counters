@@ -62,19 +62,25 @@ community=$2
 
 # Temp files
 tmpFile="$TMPDIR/check_snmp_hp-procurve-counters-"$switchIpAddr".tmp"
-# Delete them if they exist
-if [ -f $tmpFile ]; then
-   rm $tmpFile
-fi
 tmpTable="$TMPDIR/check_snmp_hp-procurve-counters-table-"$switchIpAddr".tmp"
-if [ -f $tmpTable ]; then
-   rm $tmpTable
-fi
 tmpResult="$TMPDIR/check-snmp_hp-procurve-counters-tmpResult-"$switchIpAddr".tmp"
-if [ -f $tmpResult ]; then
-   rm $tmpResult
-fi
 
+# Function to clean up temp files
+function cleanUpTempFiles {
+   # Delete them if they exist
+   if [ -f $tmpFile ]; then
+      rm $tmpFile
+   fi
+   if [ -f $tmpTable ]; then
+      rm $tmpTable
+   fi
+   if [ -f $tmpResult ]; then
+      rm $tmpResult
+   fi
+}
+
+# Call clean up temp files function
+cleanUpTempFiles
 
 # Function that extracts MAC addresses and MAC vendors
 function getMAC {
@@ -127,6 +133,8 @@ snmpwalk -v 2c -c $community $switchIpAddr $etherStatsEntry.1 | awk '{printf $4 
 if [ $? -ne 0 ]; then
    # Something's wrong
    echo "Wrong IP address or SNMP not configured for switch."
+   # Call clean up temp files function
+   cleanUpTempFiles
    exit $EXIT_UNKNOWN 
 fi
 
@@ -280,6 +288,8 @@ if [[ $criticalFlag -eq 1 ]] && [[ $warningFlag -eq 1 ]]; then
    echo "Switch $switchIpAddr got at least one CRITICAL and one WARNING counter:"
    echo ""
    cat $tmpResult
+   # Call clean up temp files function
+   cleanUpTempFiles
    # Throws out the exit code which will be handled by Nagios as Critical
    exit $EXIT_CRITICAL
 fi
@@ -289,6 +299,8 @@ if [[ $criticalFlag -eq 1 ]] ; then
    echo "Switch $switchIpAddr got at least one CRITICAL counter:"
    echo ""
    cat $tmpResult
+   # Call clean up temp files function
+   cleanUpTempFiles
    # Throws out the exit code which will be handled by Nagios as Critical
    exit $EXIT_CRITICAL
 fi
@@ -298,11 +310,15 @@ if [[ $warningFlag -eq 1 ]] ; then
    echo "Switch $switchIpAddr got at least one WARNING counter:"
    echo ""
    cat $tmpResult
+   # Call clean up temp files function
+   cleanUpTempFiles
    # Throws out the exit code which will be handled by Nagios as Warning
    exit $EXIT_WARNING
 else
    # No critical or warning found
    echo "Switch $switchIpAddr counters are ok."
+   # Call clean up temp files function
+   cleanUpTempFiles
    # Throws out the exit code which will be handled by Nagios as Ok
    exit $EXIT_OK
 fi
