@@ -144,7 +144,7 @@ if [ $? -ne 0 ]; then
    exit $EXIT_UNKNOWN 
 fi
 
-# Get number of received packets
+# Get number of Tx+Rx packets
 snmpwalk -v 2c -c $community $switchIpAddr $etherStatsEntry.5 | awk '{printf $4 " ";} END {print "";}'>>$tmpFile
 # Get drop events
 snmpwalk -v 2c -c $community $switchIpAddr $etherStatsEntry.3 | awk '{printf $4 " ";} END {print "";}'>>$tmpFile
