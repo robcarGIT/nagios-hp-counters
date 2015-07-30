@@ -107,8 +107,8 @@ function checkErrors {
                 echo "MAC(s):">>$tmpResult
 		# Call getMAC function
 		getMAC
-                echo "Description : "$longDescription>>$tmpResult
-                echo "Common cause: "$rootCause>>$tmpResult
+                echo -e "DESCRIPTION:\n"$longDescription>>$tmpResult
+                echo -e "COMMON CAUSE:\n"$rootCause>>$tmpResult
                 echo "">>$tmpResult
                 # Set critical flag
                 criticalFlag=1
@@ -117,8 +117,8 @@ function checkErrors {
                 echo "MAC(s):">>$tmpResult
 		# Call getMAC function
 		getMAC
-                echo "Description : "$longDescription>>$tmpResult
-                echo "Common cause: "$rootCause>>$tmpResult
+                echo -e "DESCRIPTION:\n"$longDescription>>$tmpResult
+                echo -e "COMMON CAUSE:\n"$rootCause>>$tmpResult
                 echo "">>$tmpResult
                 # Set warning flag
                 warningFlag=1
