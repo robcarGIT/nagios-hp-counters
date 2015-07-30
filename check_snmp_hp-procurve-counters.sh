@@ -13,8 +13,10 @@ set -o pipefail
 
 # Tmp dir
 TMPDIR=/tmp
+# Dir where oui.txt (VENDORSFILE) is saved
+OUIDIR=/usr/lib/nagios/plugins
 # File with all hardware vendors' MAC addresses
-VENDORSFILE="./oui.txt"
+VENDORSFILE="$OUIDIR/oui.txt"
 
 # Function that prints plugin usage.
 print_usage() {
@@ -102,7 +104,7 @@ function checkErrors {
              # Check if critical threshold has been reached, either as a percentage or as a general maximum.
              if [ $result -ge $maxErrorsCritical ] || [ $check -ge $maxErrorsGeneral ]; then
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") CRITICAL">>$tmpResult
-                echo "MAC Addresses connected to the port:">>$tmpResult
+                echo "MAC(s):">>$tmpResult
 		# Call getMAC function
 		getMAC
                 echo "Description : "$longDescription>>$tmpResult
@@ -112,7 +114,7 @@ function checkErrors {
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
                 echo $description $check "on" $portPkts "packets (ratio "$percentErrors"%) for port" $portDescription "(ID "$portIndex") WARNING">>$tmpResult
-                echo "MAC Addresses connected to the port:">>$tmpResult
+                echo "MAC(s):">>$tmpResult
 		# Call getMAC function
 		getMAC
                 echo "Description : "$longDescription>>$tmpResult
