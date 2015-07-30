@@ -1,12 +1,16 @@
 #!/bin/bash
 # 
 # This script gets a series of port counters from HP switches via SNMP.
-# First it checks the number of packets for every port; only if this number is >0 it does for that port a number of checks:
-# drops, CRC aligns errors, runts, giants, fragments, jabbers and collisions.
-# If the value obtained is bigger than the 2 thresholds maxErrorsWarning and maxErrorsCritical the correspondent Nagios exit code is announced.
+# First it obtains all counters from the OID tree .1.3.6.1.2.1.16.1.1.1 (indexes, drops, CRC aligns errors, runts, giants, fragments, jabbers...).
+# Everything is printed in a long column; then this string is processed to get records and a table, with every record containing the port index and error counters in CSV.
+# Then each value in the table is processed when there are actually packets flowing for the port; if even the error counter is > 0 another calculation is done to check if:
+# - max critical threshold reached
+# - max warning threshold reached
+# - max absolute threshold reached
+# If the value obtained is bigger than the three thresholds the correspondent Nagios exit code is announced.
 ##
-# Ver. 0.2b
-# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150728
+# Ver. 0.2r
+# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150730
 
 # Exit codes in pipeline are the exit codes of the last program to return a non-zero exit code. 
 set -o pipefail
