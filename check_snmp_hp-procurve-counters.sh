@@ -9,8 +9,8 @@
 # - max absolute threshold reached
 # If the value obtained is bigger than the three thresholds the correspondent Nagios exit code is announced.
 ##
-# Ver. 0.2r
-# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150730
+# Ver. 0.2s
+# Last modified by Roberto Carraro (nagios@t3ch.it) on 20150804
 
 # Exit codes in pipeline are the exit codes of the last program to return a non-zero exit code. 
 set -o pipefail
