@@ -48,16 +48,17 @@ Place it in the same directory of the plugin and give execution rights to all fo
 Then add the following definitions in your config. 
 
 Command definition:
+
 define command { 
 command_name check_snmp_hp-procurve-counters 
 command_line $USER1$/check_snmp_hp-procurve-counters.sh $HOSTADDRESS$ $ARG1$ 
 } 
 
 Service definition: 
+
 define service { 
 hostgroup_name switch 
 service_description HP-counters 
 check_command check_snmp_hp-procurve-counters!public 
 use generic-service 
-
 } 
