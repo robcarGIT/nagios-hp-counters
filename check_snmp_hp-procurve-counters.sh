@@ -84,6 +84,9 @@ function cleanUpTempFiles {
    if [ -f $tmpResult ]; then
       rm $tmpResult
    fi
+   if [ -f $tmpResultPorts ]; then
+      rm $tmpResultPorts
+   fi
 }
 
 # Call clean up temp files function
@@ -115,7 +118,7 @@ function checkErrors {
                 echo -e "DESCRIPTION:\n"$longDescription>>$tmpResult
                 echo -e "COMMON CAUSE:\n"$rootCause>>$tmpResult
                 echo "">>$tmpResult
-		echo -e $portDescription"\n">>$tmpResultPorts
+		echo -n $portDescription" ">>$tmpResultPorts
                 # Set critical flag
                 criticalFlag=1
              elif [ $result -ge $maxErrorsWarning ]; then
@@ -126,7 +129,7 @@ function checkErrors {
                 echo -e "DESCRIPTION:\n"$longDescription>>$tmpResult
                 echo -e "COMMON CAUSE:\n"$rootCause>>$tmpResult
                 echo "">>$tmpResult
-		echo -e $portDescription" \n">>$tmpResultPorts
+		echo -n $portDescription" ">>$tmpResultPorts
                 # Set warning flag
                 warningFlag=1
              fi
@@ -294,7 +297,7 @@ done <$tmpTable
 
 if [[ $criticalFlag -eq 1 ]] && [[ $warningFlag -eq 1 ]]; then
    # At least one critical and one warning found
-   echo "Switch $switchIpAddr got at least one CRITICAL and one WARNING counter for port(s): "$tmpResultPorts
+   echo "Switch $switchIpAddr got at least one CRITICAL and one WARNING counter for port(s): "`cat $tmpResultPorts`
    echo ""
    cat $tmpResult
    # Call clean up temp files function
@@ -305,7 +308,7 @@ fi
 
 if [[ $criticalFlag -eq 1 ]] ; then
    # At least one critical found
-   echo "Switch $switchIpAddr got at least one CRITICAL counter for port(s): "$tmpResultPorts
+   echo "Switch $switchIpAddr got at least one CRITICAL counter for port(s): "`cat $tmpResultPorts`
    echo ""
    cat $tmpResult
    # Call clean up temp files function
@@ -316,7 +319,7 @@ fi
 
 if [[ $warningFlag -eq 1 ]] ; then
    # At least one warning found
-   echo "Switch $switchIpAddr got at least one WARNING counter for port(s): "$tmpResultPorts
+   echo "Switch $switchIpAddr got at least one WARNING counter for port(s): "`cat $tmpResultPorts`
    echo ""
    cat $tmpResult
    # Call clean up temp files function
